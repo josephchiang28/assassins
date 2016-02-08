@@ -32,6 +32,7 @@ gem 'jbuilder', '~> 2.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
 
 gem 'devise'
+gem 'omniauth-google-oauth2'
 gem 'bootstrap-sass'
 gem 'jquery-turbolinks'
 
