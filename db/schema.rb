@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160208085205) do
+ActiveRecord::Schema.define(version: 20160208085615) do
 
   create_table "games", force: :cascade do |t|
     t.string   "name"
@@ -19,6 +19,26 @@ ActiveRecord::Schema.define(version: 20160208085205) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  create_table "players", force: :cascade do |t|
+    t.integer  "user_id",                       null: false
+    t.integer  "game_id",                       null: false
+    t.string   "nickname"
+    t.boolean  "gamemaker",     default: false, null: false
+    t.boolean  "spectator",                     null: false
+    t.boolean  "alive",                         null: false
+    t.integer  "target_id"
+    t.integer  "assassin_id"
+    t.string   "kill_code"
+    t.datetime "time_of_death"
+    t.integer  "points"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
+  add_index "players", ["game_id"], name: "index_players_on_game_id"
+  add_index "players", ["user_id", "game_id"], name: "index_players_on_user_id_and_game_id", unique: true
+  add_index "players", ["user_id"], name: "index_players_on_user_id"
 
   create_table "users", force: :cascade do |t|
     t.string   "first_name"
