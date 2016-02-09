@@ -2,14 +2,24 @@
   <div class="container">
     <h1>Welcome!</h1>
     <% if user_signed_in? %>
+      <h2>Create or Join a Game:</h2>
       <div>
-        Hello <%= current_user.first_name %>
+        <%= form_tag create_or_join_game_path do %>
+          <%= label_tag(:name, "Name") %>
+          <%= text_field_tag(:name, nil, required: true) %>
+
+          <%= label_tag(:passcode, "Passcode") %>
+          <%= text_field_tag(:passcode, nil, required: true) %>
+
+          <%= submit_tag("Create", class: 'btn btn-primary') %>
+          <%= submit_tag("Join", class: 'btn btn-primary') %>
+        <% end %>
       </div>
     <% else %>
       <p>Sign up or sign in to get started.</p>
       <div>
-        <%= link_to 'Sign up', new_user_registration_path, class: 'btn btn-primary btn-lg' %>
-        <%= link_to 'Sign in with Google', user_omniauth_authorize_path(:google_oauth2), class: 'btn btn-primary btn-lg' %>
+        <%= link_to 'Sign Up', new_user_registration_path, class: 'btn btn-primary btn-lg' %>
+        <%= link_to 'Sign In with Google', user_omniauth_authorize_path(:google_oauth2), class: 'btn btn-primary btn-lg' %>
       </div>
     <% end %>
   </div>

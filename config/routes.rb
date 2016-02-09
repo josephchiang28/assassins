@@ -11,6 +11,10 @@ Rails.application.routes.draw do
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
 
+  get 'dashboard' => 'users#dashboard', as: :user_dashboard
+  post 'game' => 'games#create_or_join', as: :create_or_join_game
+  # get 'games/:name' => 'games#view', as: :view_game
+
   # Example of named route that can be invoked with purchase_url(id: product.id)
   #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
 
