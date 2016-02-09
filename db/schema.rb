@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160208092744) do
+ActiveRecord::Schema.define(version: 20160209005515) do
 
   create_table "assignments", force: :cascade do |t|
     t.integer  "game_id",         null: false
@@ -26,8 +26,8 @@ ActiveRecord::Schema.define(version: 20160208092744) do
   add_index "assignments", ["game_id"], name: "index_assignments_on_game_id"
 
   create_table "games", force: :cascade do |t|
-    t.string   "name"
-    t.string   "passcode"
+    t.string   "name",       null: false
+    t.string   "passcode",   null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
