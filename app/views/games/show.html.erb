@@ -1,3 +1,23 @@
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('#kill-code').hide(); // Initially kill code wil be hidden.
+    $('#kill-code-hide').hide();
+
+    $('#kill-code-reveal').click(function() {
+      $('#kill-code-reveal').hide();
+      $('#kill-code-hide').show();
+      $('#kill-code').show(); // Kill code shows on button click
+    });
+
+    $('#kill-code-hide').click(function() {
+      $('#kill-code-hide').hide();
+      $('#kill-code-reveal').show();
+      $('#kill-code').hide(); // Kill code hides on button click
+    });
+  });
+</script>
+
+
 <%= 'Game: ' + @game.name %>
 <br>
 <%= 'Game Status: ' + @game.status %>
@@ -6,6 +26,11 @@
 <br>
 <%= 'Your nickname: ' + @player.nickname %>
 <br>
+
+<button type="button" id="kill-code-reveal" class="btn btn-secondary">Reveal Kill Code</button>
+<button type="button" id="kill-code-hide" class="btn btn-secondary">Hide Kill Code</button>
+<p id="kill-code">Kill code: <%= @player.kill_code%></p>
+
 <br>
 Gamemakers:
 <ul>

@@ -2,6 +2,9 @@
 <b>Name: </b><%= current_user.first_name + ' ' + current_user.last_name%>
 <br>
 <b>Email: </b><%= current_user.email %>
+<br>
+
+<%= link_to 'Create or join a game', root_path, class: 'btn btn-secondary' %>
 
 <h3>Games you manage</h3>
 <ul>
