@@ -1,4 +1,9 @@
 class GamesController < ApplicationController
+  STATUS_INACTIVE = 'inactive'
+  STATUS_ACTIVE = 'active'
+  STATUS_SUSPENDED = 'suspended'
+  STATUS_COMPLETED = 'completed'
+
   def new
     @game = Game.new
   end
@@ -21,7 +26,7 @@ class GamesController < ApplicationController
       # Need to change this
       if Game.where(name: params[:name]).empty?
         @game = Game.create(name: params[:name], passcode: params[:passcode])
-        @player = Player.create(user_id: current_user.id, game_id: @game.id, gamemaker: true, spectator: false, alive: true)
+        @player = Player.create(user_id: current_user.id, game_id: @game.id, nickname: params[:nickname], role: Player::ROLE_GAMEMAKER, alive: true)
         flash[:notice] = 'Game created!'
         redirect_to show_game_path(name: @game.name)
       else
@@ -32,6 +37,8 @@ class GamesController < ApplicationController
       flash[:notice] = 'Ooops. Something went wrong. Game not created.'
       redirect_to :back
     end
+  rescue ActionController::RedirectBackError
+    redirect_to root_path
   end
 
   def join
@@ -40,17 +47,18 @@ class GamesController < ApplicationController
       flash[:notice] = 'Name or passcode incorrect, please try again.'
       redirect_to :back
     else
-      players = Player.where(user_id: current_user.id, game_id: @game.id)
-      if players.empty?
-        @player = Player.create(user_id: current_user.id, game_id: @game.id, gamemaker: false, spectator: false, alive: true)
+      @player = Player.where(user_id: current_user.id, game_id: @game.id).first
+      if @player.nil?
+        @player = Player.create(user_id: current_user.id, game_id: @game.id, nickname: params[:nickname], role: Player::ROLE_PLAYER, alive: true)
         flash[:notice] = 'You have successfully joined the game.'
       else
-        @player = players.first
         flash[:notice] = 'You have already joined the game.'
       end
       # render 'show', name: @game.name
       redirect_to show_game_path(name: @game.name)
     end
+  rescue ActionController::RedirectBackError
+    redirect_to root_path
   end
 
   def show
@@ -71,9 +79,9 @@ class GamesController < ApplicationController
     end
     if not has_permission
       flash[:notice] = 'Error: You do not have permission to view the game named ' + params[:name] + '.'
-      return redirect_to :back
+      redirect_to :back
     end
   rescue ActionController::RedirectBackError
-    return redirect_to root_path
+    redirect_to root_path
   end
 end

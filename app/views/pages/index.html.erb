@@ -11,6 +11,9 @@
           <%= label_tag(:passcode, "Passcode") %>
           <%= text_field_tag(:passcode, nil, required: true) %>
 
+          <%= label_tag(:nickname, "Player Nickname") %>
+          <%= text_field_tag(:nickname, nil, required: true) %>
+
           <%= submit_tag("Create", class: 'btn btn-primary') %>
           <%= submit_tag("Join", class: 'btn btn-primary') %>
         <% end %>

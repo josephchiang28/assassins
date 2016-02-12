@@ -11,7 +11,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160209021444) do
+ActiveRecord::Schema.define(version: 20160212020521) do
+
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
 
   create_table "assignments", force: :cascade do |t|
     t.integer  "game_id",         null: false
@@ -23,36 +26,36 @@ ActiveRecord::Schema.define(version: 20160209021444) do
     t.datetime "updated_at",      null: false
   end
 
-  add_index "assignments", ["game_id"], name: "index_assignments_on_game_id"
+  add_index "assignments", ["game_id"], name: "index_assignments_on_game_id", using: :btree
 
   create_table "games", force: :cascade do |t|
-    t.string   "name",       null: false
-    t.string   "passcode",   null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.string   "name",                            null: false
+    t.string   "passcode",                        null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.string   "status",     default: "inactive", null: false
   end
 
-  add_index "games", ["name"], name: "index_games_on_name", unique: true
+  add_index "games", ["name"], name: "index_games_on_name", unique: true, using: :btree
 
   create_table "players", force: :cascade do |t|
-    t.integer  "user_id",                       null: false
-    t.integer  "game_id",                       null: false
+    t.integer  "user_id",       null: false
+    t.integer  "game_id",       null: false
     t.string   "nickname"
-    t.boolean  "gamemaker",     default: false, null: false
-    t.boolean  "spectator",                     null: false
-    t.boolean  "alive",                         null: false
+    t.boolean  "alive",         null: false
     t.integer  "target_id"
     t.integer  "assassin_id"
     t.string   "kill_code"
     t.datetime "time_of_death"
     t.integer  "points"
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+    t.string   "role",          null: false
   end
 
-  add_index "players", ["game_id"], name: "index_players_on_game_id"
-  add_index "players", ["user_id", "game_id"], name: "index_players_on_user_id_and_game_id", unique: true
-  add_index "players", ["user_id"], name: "index_players_on_user_id"
+  add_index "players", ["game_id"], name: "index_players_on_game_id", using: :btree
+  add_index "players", ["user_id", "game_id"], name: "index_players_on_user_id_and_game_id", unique: true, using: :btree
+  add_index "players", ["user_id"], name: "index_players_on_user_id", using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "first_name"
@@ -77,11 +80,11 @@ ActiveRecord::Schema.define(version: 20160209021444) do
     t.string   "uid"
   end
 
-  add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
-  add_index "users", ["email"], name: "index_users_on_email", unique: true
-  add_index "users", ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
-  add_index "users", ["provider"], name: "index_users_on_provider"
-  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
-  add_index "users", ["uid"], name: "index_users_on_uid"
+  add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree
+  add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
+  add_index "users", ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true, using: :btree
+  add_index "users", ["provider"], name: "index_users_on_provider", using: :btree
+  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
+  add_index "users", ["uid"], name: "index_users_on_uid", using: :btree
 
 end

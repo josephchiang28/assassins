@@ -1,1 +1,52 @@
-<%= @game.name%>
+<%= 'Game: ' + @game.name %>
+<br>
+<%= 'Game Status: ' + @game.status %>
+<br>
+<%= 'Your Role: ' + @player.role %>
+<br>
+<% if @player.nickname.nil? %>
+  <%= 'Your nickname: <nickname not set>' %>
+<% else %>
+  <%= 'Your nickname: ' + @player.nickname %>
+<% end %>
+<br>
+People in this game:
+<br>
+<% gamemakers, players, spectators = [], [], []%>
+<% participants = @game.players %>
+<% participants.each do |p| %>
+  <% if p.role == Player::ROLE_GAMEMAKER %>
+    <% gamemakers.push(p) %>
+  <% elsif p.role == Player::ROLE_PLAYER %>
+    <% players.push(p) %>
+  <% else %>
+    <% spectators.push(p) %>
+  <% end %>
+<% end %>
+
+Gamemakers:
+<ul>
+  <% gamemakers.each do |p| %>
+    <li>
+      <%= p.user.first_name + ' ' + p.user.last_name + ', aka ' + p.nickname %>
+    </li>
+  <% end %>
+</ul>
+
+Players:
+<ul>
+  <% players.each do |p| %>
+    <li>
+      <%= p.user.first_name + ' ' + p.user.last_name + ', aka ' + p.nickname %>
+    </li>
+  <% end %>
+</ul>
+
+Spectators:
+<ul>
+  <% spectators.each do |p| %>
+    <li>
+      <%= p.user.first_name + ' ' + p.user.last_name + ', aka ' + p.nickname %>
+    </li>
+  <% end %>
+</ul>
