@@ -1,2 +1,32 @@
-<%= @user.first_name %>
+<h3>Your Profile</h3>
+<b>Name: </b><%= current_user.first_name + ' ' + current_user.last_name%>
+<br>
+<b>Email: </b><%= current_user.email %>
+
+<h3>Games you manage</h3>
+<ul>
+  <% @gamemaker_games.each do |g| %>
+    <li>
+      <%= link_to g.name, show_game_path(name: g.name), class: 'btn btn-link' %>
+    </li>
+  <% end %>
+</ul>
+
+<h3>Games you play</h3>
+<ul>
+  <% @player_games.each do |g| %>
+    <li>
+      <%= link_to g.name, show_game_path(name: g.name), class: 'btn btn-link' %>
+    </li>
+  <% end %>
+</ul>
+
+<h3>Games you spectate</h3>
+<ul>
+  <% @spectator_games.each do |g| %>
+    <li>
+      <%= link_to g.name, show_game_path(name: g.name), class: 'btn btn-link' %>
+    </li>
+  <% end %>
+</ul>
 

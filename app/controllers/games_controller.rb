@@ -81,6 +81,17 @@ class GamesController < ApplicationController
       flash[:notice] = 'Error: You do not have permission to view the game named ' + params[:name] + '.'
       redirect_to :back
     end
+    @gamemakers, @players, @spectators = [], [], []
+    @participants = @game.players
+    @participants.each do |p|
+      if p.role == Player::ROLE_GAMEMAKER
+        @gamemakers.push(p)
+      elsif p.role == Player::ROLE_PLAYER
+        @players.push(p)
+      else
+        @spectators.push(p)
+      end
+    end
   rescue ActionController::RedirectBackError
     redirect_to root_path
   end
