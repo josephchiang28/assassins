@@ -77,7 +77,7 @@ class GamesController < ApplicationController
       flash[:notice] = 'Error: You do not have permission to view the game named ' + params[:name] + '.'
       return redirect_to :back
     end
-    @teams = @game.teams
+    @teams = @game.teams.sort_by{|t| t.name}
     @team_id_pairs = Array.new
     @team_id_pairs.push(['none', 0])
     @teams.each do |t|
@@ -99,7 +99,27 @@ class GamesController < ApplicationController
   end
 
   def join_team
-    redirect_to show_game_path
+    @player = Player.where(id: params[:player_id]).first
+    if params[:team_id] == '0'
+      team_name = 'none'
+    else
+      team = Team.where(id: params[:team_id]).first
+      if team
+        team_name = team.name
+      else
+        team_name = nil
+      end
+    end
+    if @player and team_name
+      @player.update(team_id: params[:team_id])
+      flash[:notice] = 'You have successfully joined team "' + team_name + '".'
+      redirect_to show_game_path
+    else
+      flash[:notice] = 'Error: Failed to join team. Player or team does not exist'
+      redirect_to :back
+    end
+  rescue ActionController::RedirectBackError
+    redirect_to root_path
   end
 
   def generate_assignments
