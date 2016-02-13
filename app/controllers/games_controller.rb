@@ -1,8 +1,4 @@
 class GamesController < ApplicationController
-  STATUS_INACTIVE = 'inactive'
-  STATUS_ACTIVE = 'active'
-  STATUS_SUSPENDED = 'suspended'
-  STATUS_COMPLETED = 'completed'
 
   def new
     @game = Game.new
@@ -79,7 +75,13 @@ class GamesController < ApplicationController
     end
     if not has_permission
       flash[:notice] = 'Error: You do not have permission to view the game named ' + params[:name] + '.'
-      redirect_to :back
+      return redirect_to :back
+    end
+    @teams = @game.teams
+    @team_id_pairs = Array.new
+    @team_id_pairs.push(['none', 0])
+    @teams.each do |t|
+      @team_id_pairs.push([t.name, t.id])
     end
     @gamemakers, @players, @spectators = [], [], []
     @participants = @game.players
@@ -92,6 +94,34 @@ class GamesController < ApplicationController
         @spectators.push(p)
       end
     end
+  rescue ActionController::RedirectBackError
+    redirect_to root_path
+  end
+
+  def join_team
+    redirect_to show_game_path
+  end
+
+  def generate_assignments
+    has_permission = true
+    if current_user.nil?
+      has_permission = false
+    else
+      @game ||= Game.where(name: params[:name]).first
+      if @game.nil?
+        has_permission = false
+      else
+        @player ||= Player.where(user_id: current_user.id, game_id: @game.id).first
+        if @player.nil?
+          has_permission = false
+        end
+      end
+    end
+    if not has_permission
+      flash[:notice] = 'Error: You do not have permission to view the game named ' + params[:name] + '.'
+      return redirect_to :back
+    end
+    @game.generate_assignments
   rescue ActionController::RedirectBackError
     redirect_to root_path
   end

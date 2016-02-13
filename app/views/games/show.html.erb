@@ -27,9 +27,36 @@
 <%= 'Your nickname: ' + @player.nickname %>
 <br>
 
-<button type="button" id="kill-code-reveal" class="btn btn-secondary">Reveal Kill Code</button>
-<button type="button" id="kill-code-hide" class="btn btn-secondary">Hide Kill Code</button>
-<p id="kill-code">Kill code: <%= @player.kill_code%></p>
+<% if @player.role == Player::ROLE_GAMEMAKER %>
+  Teams:
+  <% team_id = @player.team_id || 0 %>
+  <%= form_tag join_team_path do %>
+    <%= select_tag(:team_name, options_for_select(@team_id_pairs, team_id)) %>
+    <%= submit_tag('Join team', class: 'btn btn-secondary') %>
+  <% end %>
+  <%= form_tag create_team_path(game_id: @game.id, game_name: @game.name) do %>
+    <%= label_tag(:team_name, 'Team name: ') %>
+    <%= text_field_tag(:team_name, nil, required: true) %>
+
+    <%= submit_tag('Create', class: 'btn btn-secondary') %>
+  <% end %>
+<% elsif @player.role == Player::ROLE_SPECTATOR %>
+  Your Team:
+  <%= form_tag join_team_path do %>
+    <%= select_tag(:team_name, options_for_select([['None', 0], ['CS', 1], ['WD', 2]], 0)) %>
+    <%= submit_tag('Join team', class: 'btn btn-secondary') %>
+  <% end %>
+<% end %>
+
+<br>
+
+<% if @player.role == Player::ROLE_GAMEMAKER and @game.status == Game::STATUS_INACTIVE %>
+  <%= link_to 'Generate target assignments', generate_assignments_path, class: 'btn btn-secondary' %>
+<% elsif @player.kill_code %>
+  <button type="button" id="kill-code-reveal" class="btn btn-secondary">Reveal Kill Code</button>
+  <button type="button" id="kill-code-hide" class="btn btn-secondary">Hide Kill Code</button>
+  <p id="kill-code">Kill code: <%= @player.kill_code%></p>
+<% end %>
 
 <br>
 Gamemakers:

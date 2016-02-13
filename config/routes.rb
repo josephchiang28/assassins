@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  devise_for :users, :controllers => { :omniauth_callbacks => "omniauth_callbacks" }
+  devise_for :users, :controllers => { :omniauth_callbacks => 'omniauth_callbacks' }
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
@@ -14,6 +14,10 @@ Rails.application.routes.draw do
   get 'dashboard' => 'users#dashboard', as: :user_dashboard
   post 'games/create_or_join' => 'games#create_or_join', as: :create_or_join_game
   get 'games/:name' => 'games#show', as: :show_game
+  post 'games/:name/assignments' => 'games#generate_assignments', as: :generate_assignments
+  get 'games/:name/assignments' => 'games#show_assignments', as: :show_assignments
+  post 'games/:name/join_team' => 'games#join_team', as: :join_team
+  post 'teams/create' => 'teams#create', as: :create_team
 
   # Example of named route that can be invoked with purchase_url(id: product.id)
   #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
