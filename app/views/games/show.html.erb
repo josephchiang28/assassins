@@ -27,12 +27,12 @@
 <%= 'Your nickname: ' + @player.nickname %>
 <br>
 
+<% team_id = @player.team_id || 0 %>
 <% if @player.role == Player::ROLE_GAMEMAKER %>
   Teams:
-  <% team_id = @player.team_id || 0 %>
-  <%= form_tag join_team_path do %>
-    <%= select_tag(:team_name, options_for_select(@team_id_pairs, team_id)) %>
-    <%= submit_tag('Join team', class: 'btn btn-secondary') %>
+  <%= form_tag delete_team_path(game_id: @game.id, game_name: @game.name) do %>
+    <%= select_tag(:team_id, options_for_select(@team_id_pairs, team_id)) %>
+    <%= submit_tag('Delete team', class: 'btn btn-secondary') %>
   <% end %>
   <%= form_tag create_team_path(game_id: @game.id, game_name: @game.name) do %>
     <%= label_tag(:team_name, 'Team name: ') %>
@@ -43,7 +43,7 @@
 <% elsif @player.role == Player::ROLE_SPECTATOR %>
   Your Team:
   <%= form_tag join_team_path do %>
-    <%= select_tag(:team_name, options_for_select([['None', 0], ['CS', 1], ['WD', 2]], 0)) %>
+    <%= select_tag(:team_name, options_for_select(@team_id_pairs, team_id)) %>
     <%= submit_tag('Join team', class: 'btn btn-secondary') %>
   <% end %>
 <% end %>
