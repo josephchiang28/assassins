@@ -150,6 +150,7 @@ class GamesController < ApplicationController
   end
 
   def assignments
+    # TODO: Check permissions
     @game ||= Game.where(name: params[:name]).first
     @assignments = @game.assignments
   end
@@ -159,6 +160,26 @@ class GamesController < ApplicationController
     @game = Game.where(name: params[:name]).first
     @game.update(status: Game::STATUS_ACTIVE)
     flash[:notice] = 'Game is now active! May the best assassin prevail.'
+    redirect_to show_game_path(name: params[:name])
+  end
+
+  def kill
+    # TODO: Check permissions
+    @game = Game.where(name: params[:name]).first
+    @player = Player.find(params[:player_id])
+    is_reverse_kill = false
+    if (params[:commit] == 'Reverse Kill')
+      is_reverse_kill = true
+    end
+    if @game.register_kill(@player, params[:kill_code], is_reverse_kill)
+      if is_reverse_kill
+        flash[:notice] = 'Kill code confirmed. Your assassin has been terminated and a new one is assigned.'
+      else
+        flash[:notice] = 'Kill code incorrect. Your target has been terminated and a new one is assigned.'
+      end
+    else
+      flash[:notice] = 'Kill code incorrect. Target not terminated.'
+    end
     redirect_to show_game_path(name: params[:name])
   end
 end

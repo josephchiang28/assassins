@@ -91,6 +91,15 @@
   <div id="kill-code">Kill code: <%= @player.kill_code%></div>
 <% end %>
 
+<% if @player.role == Player::ROLE_ASSASSIN and @player.alive %>
+  <%= form_tag kill_path(player_id: @player.id) do %>
+    <%= label_tag(:kill_code, "Kill Code") %>
+    <%= text_field_tag(:kill_code, nil, required: true) %>
+
+    <%= submit_tag("Forward Kill", class: 'btn btn-secondary') %>
+    <%= submit_tag("Reverse Kill", class: 'btn btn-secondary') %>
+  <% end %>
+<% end %>
 
 <br>
 Gamemakers: <%= @gamemakers.length %>

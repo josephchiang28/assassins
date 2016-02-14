@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   post 'games/:name/generate_assignments' => 'games#generate_assignments', as: :generate_assignments
   get 'games/:name/assignments' => 'games#assignments', as: :assignments
   post 'games/:name/activate' => 'games#activate_game', as: :activate_game
+  post 'games/:name/kill' => 'games#kill', as: :kill
   post 'teams/create' => 'teams#create', as: :create_team
   post 'teams/delete' => 'teams#delete', as: :delete_team
 

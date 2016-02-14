@@ -8,6 +8,8 @@ class Game < ActiveRecord::Base
   STATUS_ACTIVE = 'active'
   STATUS_SUSPENDED = 'suspended'
   STATUS_COMPLETED = 'completed'
+  FORWARD_KILL_POINTS = 1
+  REVERSE_KILL_POINTS = 1
   TeamCount = Struct.new(:name, :count)
 
   def create_ring(players = self.players.where(role: Player::ROLE_ASSASSIN))
@@ -49,6 +51,38 @@ class Game < ActiveRecord::Base
     self.assignments.destroy_all
     ring = self.create_ring
     self.create_assignments_from_ring(ring, true)
+  end
+
+  def confirm_kill(player, kill_code, reverse=false)
+    if reverse
+      victim = Player.find(player.assassin_id)
+    else
+      victim = Player.find(player.target_id)
+    end
+    if kill_code == victim.kill_code
+      return true
+    else
+      return false
+    end
+  end
+
+  def register_kill(player, kill_code, reverse=false)
+    if not confirm_kill(player, kill_code, reverse)
+      return false
+    end
+    if reverse
+      assassin = Player.find(player.assassin_id)
+      # TODO: Implement this
+    else
+      target = Player.find(player.target_id)
+      player.update(target_id: target.target_id)
+      target.update(assassin_id: player.id)
+      player.increment!(:points, by = FORWARD_KILL_POINTS)
+      assignment_curr = self.assignments.where(killer_id: player.id, target_id: target.id, time_terminated: nil).first
+      assignment_curr.update(time_terminated: Time.now)
+      assignment_next = self.assignments.create(killer_id: player.id, target_id: target.target_id, reverse_killed: false)
+    end
+    return true
   end
 
 end
