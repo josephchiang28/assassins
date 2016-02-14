@@ -143,7 +143,7 @@ class GamesController < ApplicationController
       return redirect_to :back
     end
     @game.generate_clean_assignments
-    @game.update(status: Game::STATUS_ACTIVE)
+    @game.update(status: Game::STATUS_PENDING)
     redirect_to assignments_path
   rescue ActionController::RedirectBackError
     redirect_to root_path

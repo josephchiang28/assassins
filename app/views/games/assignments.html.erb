@@ -1,4 +1,6 @@
-<%= button_to 'Activate Game!', activate_game_path, class: 'btn btn-secondary' %>
+<% if @game.status == Game::STATUS_PENDING %>
+  <%= button_to 'Activate Game!', activate_game_path, class: 'btn btn-secondary' %>
+<% end %>
 
 <ul>
   <% @assignments.each do |assignment| %>
