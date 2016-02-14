@@ -1,0 +1,7 @@
+<ul>
+  <% @assignments.each do |assignment| %>
+    <li>
+      <%= Player.find(assignment.killer_id).nickname + ' -> ' + Player.find(assignment.target_id).nickname %>
+    </li>
+  <% end %>
+</ul>

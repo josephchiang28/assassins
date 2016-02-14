@@ -1,7 +1,21 @@
 <script type="text/javascript">
   $(document).ready(function() {
-    $('#kill-code').hide(); // Initially kill code wil be hidden.
+    $('#target').hide(); // Initially target will be hidden
+    $('#target-hide').hide();
+    $('#kill-code').hide(); // Initially kill code will be hidden.
     $('#kill-code-hide').hide();
+
+    $('#target-reveal').click(function() {
+      $('#target-reveal').hide();
+      $('#target-hide').show();
+      $('#target').show(); // Target shows on button click
+    });
+
+    $('#target-hide').click(function() {
+      $('#target-hide').hide();
+      $('#target-reveal').show();
+      $('#target').hide(); // target hides on button click
+    });
 
     $('#kill-code-reveal').click(function() {
       $('#kill-code-reveal').hide();
@@ -50,8 +64,24 @@
 
 <br>
 
-<% if @player.role == Player::ROLE_GAMEMAKER and @game.status == Game::STATUS_INACTIVE %>
-  <%= link_to 'Generate target assignments', generate_assignments_path, class: 'btn btn-secondary' %>
+<% if @player.role == Player::ROLE_PLAYER %>
+  <% if @player.target_id.nil? %>
+    Your Target: Not Assigned
+  <% else %>
+    <button type="button" id="target-reveal" class="btn btn-secondary">Reveal Target</button>
+    <button type="button" id="target-hide" class="btn btn-secondary">Hide Target</button>
+    <p id="target">Your Target: <%= Player.find(@player.target_id) %></p>
+  <% end %>
+<% end %>
+
+<br>
+
+<% if @player.role == Player::ROLE_GAMEMAKER %>
+  <%# if @game.status == Game::STATUS_INACTIVE %>
+    <%= button_to 'Generate Target Assignments', generate_assignments_path, class: 'btn btn-secondary' %>
+  <%# elsif @game.status == Game::STATUS_PENDING%>
+    <%= button_to 'Activate Game!', activate_game_path, class: 'btn btn-secondary' %>
+  <%# end %>
 <% elsif @player.kill_code %>
   <button type="button" id="kill-code-reveal" class="btn btn-secondary">Reveal Kill Code</button>
   <button type="button" id="kill-code-hide" class="btn btn-secondary">Hide Kill Code</button>
@@ -59,7 +89,7 @@
 <% end %>
 
 <br>
-Gamemakers:
+Gamemakers: <%= @gamemakers.length %>
 <ul>
   <% @gamemakers.each do |p| %>
     <li>
@@ -68,16 +98,16 @@ Gamemakers:
   <% end %>
 </ul>
 
-Players:
+Assassins: <%= @assassins_ranked.length %>
 <ul>
-  <% @players.each do |p| %>
+  <% @assassins_ranked.each do |p| %>
     <li>
-      <%= p.user.first_name + ' ' + p.user.last_name + ', aka ' + p.nickname %>
+      <%= p.user.first_name + ' ' + p.user.last_name + ', aka ' + p.nickname + ', with ' + (p.points || 0).to_s + ' points.' %>
     </li>
   <% end %>
 </ul>
 
-Spectators:
+Spectators: <%= @spectators.length %>
 <ul>
   <% @spectators.each do |p| %>
     <li>
@@ -85,3 +115,25 @@ Spectators:
     </li>
   <% end %>
 </ul>
+
+<% if @game.status == Game::STATUS_INACTIVE or @game.status == Game::STATUS_PENDING %>
+  <% survivors = @assassins_ranked.keep_if {|p| p.alive} %>
+  Surviving Assassins: <%= survivors.length %>
+  <ul>
+    <% survivors.each do |p| %>
+      <li>
+        <%= p.user.first_name + ' ' + p.user.last_name + ', aka ' + p.nickname  + ', with ' + (p.points || 0).to_s + ' points.' %>
+      </li>
+    <% end %>
+  </ul>
+
+  <% victims = @assassins_ranked.keep_if {|p| (not p.alive)} %>
+  Terminated Assassins: <%= victims.length %>
+  <ul>
+    <% victims.each do |p| %>
+      <li>
+        <%= p.user.first_name + ' ' + p.user.last_name + ', aka ' + p.nickname  + ', with ' + (p.points || 0).to_s + ' points.' %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

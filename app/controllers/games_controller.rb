@@ -83,17 +83,18 @@ class GamesController < ApplicationController
     @teams.each do |t|
       @team_id_pairs.push([t.name, t.id])
     end
-    @gamemakers, @players, @spectators = [], [], []
+    @gamemakers, @assassins, @spectators = [], [], []
     @participants = @game.players
     @participants.each do |p|
       if p.role == Player::ROLE_GAMEMAKER
         @gamemakers.push(p)
       elsif p.role == Player::ROLE_PLAYER
-        @players.push(p)
+        @assassins.push(p)
       else
         @spectators.push(p)
       end
     end
+    @assassins_ranked = @assassins.sort_by{|a| [-1 * (a.points || 0), a.user.last_name, a.user.first_name]}
   rescue ActionController::RedirectBackError
     redirect_to root_path
   end
@@ -141,8 +142,21 @@ class GamesController < ApplicationController
       flash[:notice] = 'Error: You do not have permission to view the game named ' + params[:name] + '.'
       return redirect_to :back
     end
-    @game.generate_assignments
+    @game.generate_clean_assignments
+    @game.update(status: Game::STATUS_ACTIVE)
+    redirect_to assignments_path
   rescue ActionController::RedirectBackError
     redirect_to root_path
+  end
+
+  def assignments
+    @game ||= Game.where(name: params[:name]).first
+    @assignments = @game.assignments
+  end
+
+  def activate_game
+    # TODO: Check permissions
+    @game = Game.where(name: params[:name]).first
+    @game.update(status: Game::STATUS_ACTIVE)
   end
 end
