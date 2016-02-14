@@ -10,7 +10,7 @@ class Game < ActiveRecord::Base
   STATUS_COMPLETED = 'completed'
   TeamCount = Struct.new(:name, :count)
 
-  def create_ring(players = self.players.where(role: Player::ROLE_PLAYER))
+  def create_ring(players = self.players.where(role: Player::ROLE_ASSASSIN))
     ring = players.shuffle
     # TODO: Improve ring generation algorith
     # ring = Array.new

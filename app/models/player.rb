@@ -4,6 +4,6 @@ class Player < ActiveRecord::Base
   belongs_to :team
 
   ROLE_GAMEMAKER = 'gamemaker'
-  ROLE_PLAYER = 'player'
+  ROLE_ASSASSIN = 'assassin'
   ROLE_SPECTATOR = 'spectator'
 end

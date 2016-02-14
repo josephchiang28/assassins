@@ -45,7 +45,7 @@ class GamesController < ApplicationController
     else
       @player = Player.where(user_id: current_user.id, game_id: @game.id).first
       if @player.nil?
-        @player = Player.create(user_id: current_user.id, game_id: @game.id, nickname: params[:nickname], role: Player::ROLE_PLAYER, alive: true)
+        @player = Player.create(user_id: current_user.id, game_id: @game.id, nickname: params[:nickname], role: Player::ROLE_ASSASSIN, alive: true)
         flash[:notice] = 'You have successfully joined the game.'
       else
         flash[:notice] = 'You have already joined the game.'
@@ -88,7 +88,7 @@ class GamesController < ApplicationController
     @participants.each do |p|
       if p.role == Player::ROLE_GAMEMAKER
         @gamemakers.push(p)
-      elsif p.role == Player::ROLE_PLAYER
+      elsif p.role == Player::ROLE_ASSASSIN
         @assassins.push(p)
       else
         @spectators.push(p)

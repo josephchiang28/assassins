@@ -7,7 +7,7 @@ class UsersController < ApplicationController
       if p.role == Player::ROLE_GAMEMAKER
         @gamemakers.push(p)
         @gamemaker_games.push(p.game)
-      elsif p.role == Player::ROLE_PLAYER
+      elsif p.role == Player::ROLE_ASSASSIN
         @players.push(p)
         @player_games.push(p.game)
       else
