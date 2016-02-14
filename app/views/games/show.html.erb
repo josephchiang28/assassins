@@ -70,7 +70,8 @@
   <% else %>
     <button type="button" id="target-reveal" class="btn btn-secondary">Reveal Target</button>
     <button type="button" id="target-hide" class="btn btn-secondary">Hide Target</button>
-    <p id="target">Your Target: <%= Player.find(@player.target_id) %></p>
+    <% target_user = Player.find(@player.target_id).user %>
+    <div id="target">Your Target: <%= target_user.first_name + ' ' + target_user.last_name %></div>
   <% end %>
 <% end %>
 
@@ -85,7 +86,7 @@
 <% elsif @player.kill_code %>
   <button type="button" id="kill-code-reveal" class="btn btn-secondary">Reveal Kill Code</button>
   <button type="button" id="kill-code-hide" class="btn btn-secondary">Hide Kill Code</button>
-  <p id="kill-code">Kill code: <%= @player.kill_code%></p>
+  <div id="kill-code">Kill code: <%= @player.kill_code%></div>
 <% end %>
 
 <br>
@@ -116,7 +117,7 @@ Spectators: <%= @spectators.length %>
   <% end %>
 </ul>
 
-<% if @game.status == Game::STATUS_INACTIVE or @game.status == Game::STATUS_PENDING %>
+<% if @game.status == Game::STATUS_ACTIVE or @game.status == Game::STATUS_SUSPENDED or @game.status == Game::STATUS_COMPLETED %>
   <% survivors = @assassins_ranked.keep_if {|p| p.alive} %>
   Surviving Assassins: <%= survivors.length %>
   <ul>

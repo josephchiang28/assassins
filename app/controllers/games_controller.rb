@@ -158,5 +158,7 @@ class GamesController < ApplicationController
     # TODO: Check permissions
     @game = Game.where(name: params[:name]).first
     @game.update(status: Game::STATUS_ACTIVE)
+    flash[:notice] = 'Game is now active! May the best assassin prevail.'
+    redirect_to show_game_path(name: params[:name])
   end
 end

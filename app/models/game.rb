@@ -35,10 +35,13 @@ class Game < ActiveRecord::Base
     for i in 0..ring.length-1
       player = ring[i]
       if clean
-        player.points = 0
+        player.update(points: 0)
+        player.update(kill_code: SecureRandom.base64(5))
       end
-      player.alive = true
-      self.assignments.create(killer_id: player.id, target_id: ring[(i + 1) % ring.length].id, reverse_killed: false)
+      player.update(alive: true)
+      target_id = ring[(i + 1) % ring.length].id
+      player.update(target_id: target_id)
+      self.assignments.create(killer_id: player.id, target_id: target_id, reverse_killed: false)
     end
   end
 
