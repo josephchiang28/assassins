@@ -11,19 +11,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160212105815) do
+ActiveRecord::Schema.define(version: 20160215003518) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "assignments", force: :cascade do |t|
-    t.integer  "game_id",         null: false
-    t.integer  "killer_id",       null: false
-    t.integer  "target_id",       null: false
-    t.datetime "time_terminated"
-    t.boolean  "reverse_killed",  null: false
-    t.datetime "created_at",      null: false
-    t.datetime "updated_at",      null: false
+    t.integer  "game_id",                               null: false
+    t.integer  "killer_id",                             null: false
+    t.integer  "target_id",                             null: false
+    t.datetime "time_deactivated"
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.string   "status",           default: "inactive", null: false
+    t.datetime "time_activated"
   end
 
   add_index "assignments", ["game_id"], name: "index_assignments_on_game_id", using: :btree

@@ -9,7 +9,7 @@ class Game < ActiveRecord::Base
   STATUS_SUSPENDED = 'suspended'
   STATUS_COMPLETED = 'completed'
   FORWARD_KILL_POINTS = 1
-  REVERSE_KILL_POINTS = 1
+  REVERSE_KILL_POINTS = 2
   TeamCount = Struct.new(:name, :count)
 
   def create_ring(players = self.players.where(role: Player::ROLE_ASSASSIN))
@@ -43,7 +43,7 @@ class Game < ActiveRecord::Base
       player.update(alive: true)
       target_id = ring[(i + 1) % ring.length].id
       player.update(target_id: target_id)
-      self.assignments.create(killer_id: player.id, target_id: target_id, reverse_killed: false)
+      self.assignments.create(killer_id: player.id, target_id: target_id, status: Assignment::STATUS_INACTIVE)
     end
   end
 
@@ -51,6 +51,14 @@ class Game < ActiveRecord::Base
     self.assignments.destroy_all
     ring = self.create_ring
     self.create_assignments_from_ring(ring, true)
+  end
+
+  def activate
+    self.assignments.each do |assignment|
+      assignment.update(status: Assignment::STATUS_ACTIVE)
+      assignment.update(time_activated: Time.now)
+    end
+    self.update(status: Game::STATUS_ACTIVE)
   end
 
   def confirm_kill(player, kill_code, reverse=false)
@@ -61,9 +69,8 @@ class Game < ActiveRecord::Base
     end
     if kill_code == victim.kill_code
       return true
-    else
-      return false
     end
+    return false
   end
 
   def register_kill(player, kill_code, reverse=false)
@@ -71,16 +78,27 @@ class Game < ActiveRecord::Base
       return false
     end
     if reverse
-      assassin = Player.find(player.assassin_id)
-      # TODO: Implement this
+      victim = Player.find(player.assassin_id)
+      new_assassin = Player.find(victim.assassin_id)
+      new_assassin.update(target_id: player.id)
+      player.update(assassin_id: new_assassin.id)
+      player.increment!(:points, by = REVERSE_KILL_POINTS)
+      assignment_reversed = self.assignments.where(killer_id: victim.id, target_id: player.id, status: Assignment::STATUS_ACTIVE).first
+      assignment_reversed.update(status: Assignment::STATUS_BACKFIRED, time_deactivated: Time.now)
+      assignment_stolen = self.assignments.where(killer_id: new_assassin.id, target_id: victim.id, status: Assignment::STATUS_ACTIVE).first
+      assignment_stolen.update(status: Assignment::STATUS_STOLEN, time_deactivated: Time.now)
+      self.assignments.create(killer_id: new_assassin.id, target_id: player.id, status: Assignment::STATUS_ACTIVE, time_activated: Time.now)
     else
-      target = Player.find(player.target_id)
-      player.update(target_id: target.target_id)
-      target.update(assassin_id: player.id)
+      victim = Player.find(player.target_id)
+      next_target = Player.find(victim.target_id)
+      next_target.update(assassin_id: player.id)
+      player.update(target_id: victim.target_id)
       player.increment!(:points, by = FORWARD_KILL_POINTS)
-      assignment_curr = self.assignments.where(killer_id: player.id, target_id: target.id, time_terminated: nil).first
-      assignment_curr.update(time_terminated: Time.now)
-      assignment_next = self.assignments.create(killer_id: player.id, target_id: target.target_id, reverse_killed: false)
+      assignment_curr = self.assignments.where(killer_id: player.id, target_id: victim.id, status: Assignment::STATUS_ACTIVE).first
+      assignment_curr.update(status: Assignment::STATUS_COMPLETED, time_deactivated: Time.now)
+      assignment_failed = self.assignments.where(killder_id: victim.id, target_id: next_target.id, status: Assignment::STATUS_ACTIVE).first
+      assignment_failed.update(status: Assignment::STATUS_FAILED, time_deactivated: Time.now)
+      self.assignments.create(killer_id: player.id, target_id: next_target.id, status: Assignment::STATUS_ACTIVE, time_activated: Time.now)
     end
     return true
   end

@@ -38,8 +38,13 @@
 <br>
 <%= 'Your Role: ' + @player.role %>
 <br>
-<%= 'Your nickname: ' + @player.nickname %>
+<%= 'Your Nickname: ' + @player.nickname %>
 <br>
+<% if @player.alive %>
+  Your Status: alive
+<% else %>
+  Your Status: dead
+<% end %>
 
 <% team_id = @player.team_id || 0 %>
 <% if @player.role == Player::ROLE_GAMEMAKER %>
