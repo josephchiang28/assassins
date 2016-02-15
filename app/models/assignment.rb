@@ -7,4 +7,5 @@ class Assignment < ActiveRecord::Base
   STATUS_STOLEN = 'stolen'       # Target got reverse killed
   STATUS_COMPLETED = 'completed' # Successful completion of assignment
   STATUS_BACKFIRED = 'backfired' # Got reverse killed
+  STATUS_DISCARDED = 'discarded' # Discarded, target reassigned manually
 end

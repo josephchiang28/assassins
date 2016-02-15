@@ -5,10 +5,10 @@
   <%= button_to 'Re-generate all target Assignments', generate_assignments_path, class: 'btn btn-secondary' %>
 <% end %>
 
-<ul>
+<ol>
   <% @assignments.each do |assignment| %>
     <li>
       <%= Player.find(assignment.killer_id).nickname + ' -> ' + Player.find(assignment.target_id).nickname %>
     </li>
   <% end %>
-</ul>
+</ol>

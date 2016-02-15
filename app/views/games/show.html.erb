@@ -73,7 +73,7 @@
 
 <br>
 
-<% if @player.role == Player::ROLE_ASSASSIN and @player.alive %>
+<% if @player.role == Player::ROLE_ASSASSIN and @player.alive and @game.status != Game::STATUS_COMPLETED %>
   <% if @player.target_id.nil? %>
     Your Target: Not Assigned
   <% else %>
@@ -95,7 +95,7 @@
   <% else %>
     <%= link_to 'Manage Assignments', assignments_path, class: 'btn btn-secondary' %>
   <% end %>
-<% elsif @player.kill_code and @player.alive%>
+<% elsif @player.kill_code and @player.alive and @game.status != Game::STATUS_COMPLETED%>
   <button type="button" id="kill-code-reveal" class="btn btn-secondary">Reveal Kill Code</button>
   <button type="button" id="kill-code-hide" class="btn btn-secondary">Hide Kill Code</button>
   <div id="kill-code">Kill code: <%= @player.kill_code%></div>
@@ -107,7 +107,9 @@
     <%= text_field_tag(:kill_code, nil, required: true) %>
 
     <%= submit_tag("Forward Kill", class: 'btn btn-secondary') %>
-    <%= submit_tag("Reverse Kill", class: 'btn btn-secondary') %>
+    <% if survivors.length > 2 %>
+      <%= submit_tag("Reverse Kill", class: 'btn btn-secondary') %>
+    <% end %>
   <% end %>
 <% end %>
 

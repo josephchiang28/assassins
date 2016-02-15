@@ -174,7 +174,9 @@ class GamesController < ApplicationController
       is_reverse_kill = true
     end
     if @game.register_kill(@player, params[:kill_code], is_reverse_kill)
-      if is_reverse_kill
+      if @game.is_completed
+        flash[:notice] = 'Kill code confirmed. Congratulations, you are the last assassin standing!'
+      elsif is_reverse_kill
         flash[:notice] = 'Kill code confirmed. Your assassin has been terminated and a new one is assigned.'
       else
         flash[:notice] = 'Kill code confirmed. Your target has been terminated and a new one is assigned.'

@@ -63,6 +63,14 @@ class Game < ActiveRecord::Base
     self.update(status: Game::STATUS_ACTIVE)
   end
 
+  def complete_game
+    self.update(status: Game::STATUS_COMPLETED)
+  end
+
+  def is_completed
+    self.status == Game::STATUS_COMPLETED
+  end
+
   def confirm_kill(player, kill_code, reverse=false)
     if reverse
       victim = Player.find(player.assassin_id)
@@ -103,6 +111,9 @@ class Game < ActiveRecord::Base
       assignment_failed = self.assignments.where(killer_id: victim.id, target_id: next_target.id, status: Assignment::STATUS_ACTIVE).first
       assignment_failed.update(status: Assignment::STATUS_FAILED, time_deactivated: Time.now)
       self.assignments.create(killer_id: player.id, target_id: next_target.id, status: Assignment::STATUS_ACTIVE, time_activated: Time.now)
+    end
+    if self.players.where(role: Player::ROLE_ASSASSIN, alive: true).length == 1
+      self.complete_game
     end
     return true
   end
