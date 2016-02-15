@@ -1,7 +1,7 @@
-<% if @game.status == Game::STATUS_PENDING %>
+<% if @game.is_pending %>
   <%= button_to 'Re-generate all target Assignments', generate_assignments_path, class: 'btn btn-secondary' %>
   <%= button_to 'Confirm Assignments and Activate Game!', activate_game_path, class: 'btn btn-secondary' %>
-<% elsif @game.status == Game::STATUS_ACTIVE or @game.status == Game::STATUS_SUSPENDED %>
+<% elsif @game.is_active or @game.is_suspended %>
   <%= button_to 'Re-generate all target Assignments', generate_assignments_path, class: 'btn btn-secondary' %>
 <% end %>
 

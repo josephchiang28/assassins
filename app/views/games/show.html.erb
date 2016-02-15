@@ -40,7 +40,7 @@
 <br>
 <%= 'Your Nickname: ' + @player.nickname %>
 <br>
-<% if @player.role == Player::ROLE_ASSASSIN and (@game.status == Game::STATUS_ACTIVE or @game.status == Game::STATUS_SUSPENDED or @game.status == Game::STATUS_COMPLETED) %>
+<% if @player.is_assassin and (@game.is_active or @game.is_suspended or @game.is_completed) %>
   <% if @player.alive %>
     Your Status: alive
   <% else %>
@@ -51,7 +51,7 @@
 <br>
 
 <% team_id = @player.team_id || 0 %>
-<% if @player.role == Player::ROLE_GAMEMAKER %>
+<% if @player.is_gamemaker %>
   Teams:
   <%= form_tag delete_team_path(game_id: @game.id, game_name: @game.name) do %>
     <%= select_tag(:team_id, options_for_select(@team_id_pairs, team_id)) %>
@@ -63,7 +63,7 @@
 
     <%= submit_tag('Create', class: 'btn btn-secondary') %>
   <% end %>
-<% elsif @player.role == Player::ROLE_ASSASSIN %>
+<% elsif @player.is_assassin %>
   Your Team:
   <%= form_tag join_team_path(player_id: @player.id) do %>
     <%= select_tag(:team_id, options_for_select(@team_id_pairs, team_id)) %>
@@ -73,7 +73,7 @@
 
 <br>
 
-<% if @player.role == Player::ROLE_ASSASSIN and @player.alive and @game.status != Game::STATUS_COMPLETED %>
+<% if @player.is_assassin and @player.alive and not @game.is_completed %>
   <% if @player.target_id.nil? %>
     Your Target: Not Assigned
   <% else %>
@@ -86,22 +86,22 @@
 
 <br>
 
-<% if @player.role == Player::ROLE_GAMEMAKER %>
-  <% if @game.status == Game::STATUS_INACTIVE %>
+<% if @player.is_gamemaker %>
+  <% if @game.is_inactive %>
     <%= button_to 'Generate Target Assignments', generate_assignments_path, class: 'btn btn-secondary' %>
-  <% elsif @game.status == Game::STATUS_PENDING%>
+  <% elsif @game.is_pending %>
     <%= link_to 'Manage Assignments', assignments_path, class: 'btn btn-secondary' %>
     <%= button_to 'Confirm Assignments and Activate Game!', activate_game_path, class: 'btn btn-secondary' %>
   <% else %>
     <%= link_to 'Manage Assignments', assignments_path, class: 'btn btn-secondary' %>
   <% end %>
-<% elsif @player.kill_code and @player.alive and @game.status != Game::STATUS_COMPLETED%>
+<% elsif @player.kill_code and @player.alive and @game.is_active %>
   <button type="button" id="kill-code-reveal" class="btn btn-secondary">Reveal Kill Code</button>
   <button type="button" id="kill-code-hide" class="btn btn-secondary">Hide Kill Code</button>
   <div id="kill-code">Kill code: <%= @player.kill_code%></div>
 <% end %>
 
-<% if @player.role == Player::ROLE_ASSASSIN and @game.status == Game::STATUS_ACTIVE and @player.alive %>
+<% if @player.is_assassin and @game.is_active and @player.alive %>
   <%= form_tag kill_path(player_id: @player.id) do %>
     <%= label_tag(:kill_code, "Kill Code") %>
     <%= text_field_tag(:kill_code, nil, required: true) %>
@@ -141,7 +141,7 @@ Spectators: <%= @spectators.length %>
   <% end %>
 </ul>
 
-<% if @game.status == Game::STATUS_ACTIVE or @game.status == Game::STATUS_SUSPENDED or @game.status == Game::STATUS_COMPLETED %>
+<% if @game.is_active or @game.is_suspended or @game.is_completed %>
   Surviving Assassins: <%= @survivors.length %>
   <ul>
     <% @survivors.each do |p| %>

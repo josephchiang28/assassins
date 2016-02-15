@@ -4,10 +4,10 @@ class UsersController < ApplicationController
     @gamemakers, @players, @spectators = [], [], []
     @gamemaker_games, @player_games, @spectator_games = [], [], []
     @game_players.each do |p|
-      if p.role == Player::ROLE_GAMEMAKER
+      if p.is_gamemaker
         @gamemakers.push(p)
         @gamemaker_games.push(p.game)
-      elsif p.role == Player::ROLE_ASSASSIN
+      elsif p.is_assassin
         @players.push(p)
         @player_games.push(p.game)
       else

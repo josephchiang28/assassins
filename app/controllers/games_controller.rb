@@ -86,9 +86,9 @@ class GamesController < ApplicationController
     @gamemakers, @assassins, @spectators = [], [], []
     @participants = @game.players
     @participants.each do |p|
-      if p.role == Player::ROLE_GAMEMAKER
+      if p.is_gamemaker
         @gamemakers.push(p)
-      elsif p.role == Player::ROLE_ASSASSIN
+      elsif p.is_assassin
         @assassins.push(p)
       else
         @spectators.push(p)

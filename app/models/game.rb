@@ -60,15 +60,31 @@ class Game < ActiveRecord::Base
       assignment.update(status: Assignment::STATUS_ACTIVE)
       assignment.update(time_activated: Time.now)
     end
-    self.update(status: Game::STATUS_ACTIVE)
+    self.update(status: STATUS_ACTIVE)
   end
 
   def complete_game
-    self.update(status: Game::STATUS_COMPLETED)
+    self.update(status: STATUS_COMPLETED)
   end
 
   def is_completed
-    self.status == Game::STATUS_COMPLETED
+    self.status == STATUS_COMPLETED
+  end
+
+  def is_inactive
+    self.status == STATUS_INACTIVE
+  end
+
+  def is_pending
+    self.status == STATUS_PENDING
+  end
+
+  def is_active
+    self.status == STATUS_ACTIVE
+  end
+
+  def is_suspended
+    self.status == STATUS_SUSPENDED
   end
 
   def confirm_kill(player, kill_code, reverse=false)
