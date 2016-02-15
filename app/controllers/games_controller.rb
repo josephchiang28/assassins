@@ -95,6 +95,8 @@ class GamesController < ApplicationController
       end
     end
     @assassins_ranked = @assassins.sort_by{|a| [-1 * (a.points || 0), a.user.last_name, a.user.first_name]}
+    @survivors = @assassins_ranked.clone.keep_if {|p| p.alive}
+    @victims = @assassins_ranked.clone.delete_if {|p| p.alive}
   rescue ActionController::RedirectBackError
     redirect_to root_path
   end
@@ -175,10 +177,10 @@ class GamesController < ApplicationController
       if is_reverse_kill
         flash[:notice] = 'Kill code confirmed. Your assassin has been terminated and a new one is assigned.'
       else
-        flash[:notice] = 'Kill code incorrect. Your target has been terminated and a new one is assigned.'
+        flash[:notice] = 'Kill code confirmed. Your target has been terminated and a new one is assigned.'
       end
     else
-      flash[:notice] = 'Kill code incorrect. Target not terminated.'
+      flash[:notice] = 'Kill code incorrect. Target or assassin not terminated.'
     end
     redirect_to show_game_path(name: params[:name])
   end

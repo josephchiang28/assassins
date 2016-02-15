@@ -3,8 +3,8 @@ class Game < ActiveRecord::Base
   has_many :assignments
   has_many :teams
 
-  STATUS_INACTIVE = 'inactive: assignments not generated game not started'
-  STATUS_PENDING = 'pending: assignments generated game started'
+  STATUS_INACTIVE = 'inactive' # Assignments not generated game not started
+  STATUS_PENDING = 'pending' # Assignments generated game started
   STATUS_ACTIVE = 'active'
   STATUS_SUSPENDED = 'suspended'
   STATUS_COMPLETED = 'completed'
@@ -33,7 +33,7 @@ class Game < ActiveRecord::Base
   end
 
   def create_assignments_from_ring(ring, clean)
-    self.assignments.where(time_terminated: nil).destroy_all
+    self.assignments.where(time_deactivated: nil).destroy_all
     for i in 0..ring.length-1
       player = ring[i]
       if clean
@@ -42,7 +42,9 @@ class Game < ActiveRecord::Base
       end
       player.update(alive: true)
       target_id = ring[(i + 1) % ring.length].id
+      assassin_id = ring[(i - 1 + ring.length) % ring.length].id
       player.update(target_id: target_id)
+      player.update(assassin_id: assassin_id)
       self.assignments.create(killer_id: player.id, target_id: target_id, status: Assignment::STATUS_INACTIVE)
     end
   end
@@ -79,6 +81,7 @@ class Game < ActiveRecord::Base
     end
     if reverse
       victim = Player.find(player.assassin_id)
+      victim.update(alive: false, time_of_death: Time.now)
       new_assassin = Player.find(victim.assassin_id)
       new_assassin.update(target_id: player.id)
       player.update(assassin_id: new_assassin.id)
@@ -90,13 +93,14 @@ class Game < ActiveRecord::Base
       self.assignments.create(killer_id: new_assassin.id, target_id: player.id, status: Assignment::STATUS_ACTIVE, time_activated: Time.now)
     else
       victim = Player.find(player.target_id)
+      victim.update(alive: false, time_of_death: Time.now)
       next_target = Player.find(victim.target_id)
       next_target.update(assassin_id: player.id)
       player.update(target_id: victim.target_id)
       player.increment!(:points, by = FORWARD_KILL_POINTS)
       assignment_curr = self.assignments.where(killer_id: player.id, target_id: victim.id, status: Assignment::STATUS_ACTIVE).first
       assignment_curr.update(status: Assignment::STATUS_COMPLETED, time_deactivated: Time.now)
-      assignment_failed = self.assignments.where(killder_id: victim.id, target_id: next_target.id, status: Assignment::STATUS_ACTIVE).first
+      assignment_failed = self.assignments.where(killer_id: victim.id, target_id: next_target.id, status: Assignment::STATUS_ACTIVE).first
       assignment_failed.update(status: Assignment::STATUS_FAILED, time_deactivated: Time.now)
       self.assignments.create(killer_id: player.id, target_id: next_target.id, status: Assignment::STATUS_ACTIVE, time_activated: Time.now)
     end
